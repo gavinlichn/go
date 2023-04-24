@@ -151,6 +151,7 @@ type gcControllerState struct {
 	// Whenever this is updated, call traceHeapAlloc() and
 	// this gcControllerState's revise() method.
 	heapLive uint64
+	pad0 cpu.CacheLinePad // prevents false-sharing between heapLive and heapScan
 
 	// heapScan is the number of bytes of "scannable" heap. This
 	// is the live heap (as counted by heapLive), but omitting
@@ -161,6 +162,7 @@ type gcControllerState struct {
 	//
 	// Read and written atomically or with the world stopped.
 	heapScan uint64
+	pad1 cpu.CacheLinePad // prevents false-sharing between heapLive and heapScan
 
 	// heapMarked is the number of bytes marked by the previous
 	// GC. After mark termination, heapLive == heapMarked, but
@@ -178,6 +180,7 @@ type gcControllerState struct {
 	// this is an opaque unit of work, but for estimation the
 	// definition is important.
 	scanWork int64
+	pad2 cpu.CacheLinePad // prevents false-sharing between heapLive and heapScan
 
 	// bgScanCredit is the scan work credit accumulated by the
 	// concurrent background scan. This credit is accumulated by
@@ -196,6 +199,7 @@ type gcControllerState struct {
 	// mark workers during this cycle. This is updated atomically
 	// at the end of the concurrent mark phase.
 	dedicatedMarkTime int64
+	pad3 cpu.CacheLinePad // prevents false-sharing between dedicatedMarkTime and dedicatedMarkWorkersNeeded
 
 	// fractionalMarkTime is the nanoseconds spent in the
 	// fractional mark worker during this cycle. This is updated
@@ -217,6 +221,7 @@ type gcControllerState struct {
 	// beginning of each cycle and decremented atomically as
 	// dedicated mark workers get started.
 	dedicatedMarkWorkersNeeded int64
+	pad4 cpu.CacheLinePad // prevents false-sharing between dedicatedMarkWorkersNeeded and assistWorkPerByte
 
 	// assistWorkPerByte is the ratio of scan work to allocated
 	// bytes that should be performed by mutator assists. This is
